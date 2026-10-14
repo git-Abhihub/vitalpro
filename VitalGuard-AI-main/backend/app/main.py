@@ -45,7 +45,10 @@ _default_origins = [
     "http://127.0.0.1:8000",
     "https://vitalguard-ai-frontend.onrender.com",
 ]
-_origins = os.getenv("CORS_ORIGINS", ",".join(_default_origins))
+_configured_origins = os.getenv("CORS_ORIGINS", "")
+# Always retain the known local simulator and hosted frontend origins, even
+# when Render has a narrower CORS_ORIGINS environment variable configured.
+_origins = ",".join(dict.fromkeys(_default_origins + [origin.strip() for origin in _configured_origins.split(",") if origin.strip()]))
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[origin.strip() for origin in _origins.split(",") if origin.strip()],
