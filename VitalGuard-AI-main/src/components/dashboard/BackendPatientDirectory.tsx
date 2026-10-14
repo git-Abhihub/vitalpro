@@ -44,7 +44,10 @@ export function BackendPatientDirectory() {
 
       {error && <p role="alert" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-200">{error}</p>}
       {loading && !data ? <p className="text-sm text-slate-500 mt-4">Loading persisted patient summaries…</p> :
-        data && data.items.length === 0 ? <p className="text-sm text-slate-500 mt-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4">No backend patient observations yet. Open Settings → Risk Engine to submit a fictional observation, or use the API documentation.</p> :
+        data && data.items.length === 0 ? <div className="mt-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4">
+          <p className="text-sm text-slate-500">No backend patient observations yet. Create a fictional observation to populate this view.</p>
+          <Link to="/settings" className="btn-primary inline-flex mt-3">Open Risk Engine</Link>
+        </div> :
         data && <div className="mt-3 overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="table-head"><th>Demo patient</th><th>Age</th><th>Latest synthetic score</th><th>Observations</th><th>Last observed</th><th><span className="sr-only">Open</span></th></tr></thead>
