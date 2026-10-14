@@ -25,6 +25,25 @@ describe('backend API client', () => {
     expect(new Headers(init.headers).has('Content-Type')).toBe(false);
   });
 
+  it('requests a synthetic profile for a patient even before observations exist', async () => {
+    const profile = {
+      patient_id: 'P-SIM-003', full_name: 'Fictional Demo', age: 67,
+      demo_only: true, clinically_validated: false,
+    };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => profile,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await api.getSyntheticProfile('P-SIM-003', 67);
+
+    expect(result.patient_id).toBe('P-SIM-003');
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      `${APP_CONFIG.apiBaseUrl}/api/v1/patient-profiles/P-SIM-003?age=67`,
+    );
+  });
+
   it('URL-encodes patient IDs in the patient history endpoint', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
