@@ -41,6 +41,8 @@ app.include_router(news2_router)
 _default_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     "https://vitalguard-ai-frontend.onrender.com",
 ]
 _origins = os.getenv("CORS_ORIGINS", ",".join(_default_origins))
