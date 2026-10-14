@@ -43,6 +43,20 @@ export interface ObservationHistory {
   demo_only: true;
   disclaimer: string;
 }
+export interface PatientProgress {
+  sample_count: number;
+  risk_scores: number[];
+  heart_rates: number[];
+  spo2_values: number[];
+  systolic_bp_values: number[];
+  timestamps: string[];
+  previous_risk_score: number | null;
+  risk_delta: number | null;
+  risk_direction: 'increasing' | 'decreasing' | 'stable' | 'insufficient_data';
+  first_observed_at: string | null;
+  last_observed_at: string | null;
+  description: string;
+}
 export interface BackendPatientSummary {
   patient_id: string;
   age: number | null;
@@ -52,6 +66,38 @@ export interface BackendPatientSummary {
   latest_inputs: Omit<RiskPredictionInput, 'patient_id'>;
   latest_prediction: RiskPredictionResult;
   model_version: string;
+  progress: PatientProgress;
+  demo_only: true;
+}
+export interface BackendAlert {
+  id: number;
+  patient_id: string;
+  severity: string;
+  status: 'open' | 'acknowledged' | 'resolved';
+  title: string;
+  created_at: string;
+  acknowledged_by?: string | null;
+  observation_id?: number | null;
+}
+export interface BackendObservationQualityItem {
+  patient_id: string;
+  latest_observation_id: number;
+  last_observed_at: string | null;
+  age_seconds: number | null;
+  status: 'fresh' | 'stale' | 'incomplete' | 'unknown';
+  missing_fields: string[];
+}
+export interface BackendObservationQuality {
+  items: BackendObservationQualityItem[];
+  count: number;
+  stale_after_seconds: number;
+  demo_only: true;
+  disclaimer: string;
+}
+export interface BackendAlertList {
+  items: BackendAlert[];
+  count: number;
+  limit: number;
   demo_only: true;
 }
 export interface BackendPatientList {
@@ -117,6 +163,15 @@ export const api = {
     const params = new URLSearchParams({ limit: String(limit) });
     if (patientId) params.set('patient_id', patientId);
     return get<ObservationHistory>(`/api/v1/observations?${params.toString()}`);
+  },
+  listAlerts: (limit = 100) =>
+    get<BackendAlertList>(`/api/v1/alerts?limit=${limit}`),
+  getObservationQuality: (staleAfterSeconds = 300, limit = 100) => {
+    const params = new URLSearchParams({
+      stale_after_seconds: String(staleAfterSeconds),
+      limit: String(limit),
+    });
+    return get<BackendObservationQuality>(`/api/v1/observations/quality?${params.toString()}`);
   },
   health: () =>
     get<{ status: string; model_version: string; demo_only: boolean; storage_backend?: 'sqlite' | 'postgresql'; persistent_storage_configured?: boolean }>('/health'),
