@@ -38,9 +38,48 @@ export interface ObservationHistory {
   demo_only: true;
   disclaimer: string;
 }
+export interface BackendPatientSummary {
+  patient_id: string;
+  age: number | null;
+  latest_observation_id: number;
+  last_observed_at: string;
+  observation_count: number;
+  latest_inputs: Omit<RiskPredictionInput, 'patient_id'>;
+  latest_prediction: RiskPredictionResult;
+  model_version: string;
+  demo_only: true;
+}
+export interface BackendPatientList {
+  items: BackendPatientSummary[];
+  count: number;
+  limit: number;
+  demo_only: true;
+  disclaimer: string;
+}
+export interface PatientVitalRecord extends Omit<RiskPredictionInput, 'patient_id'> {
+  observation_id: number;
+  patient_id: string;
+  timestamp: string;
+  risk_score: number;
+  risk_level: 'low' | 'moderate' | 'high' | 'critical';
+  model_probability: number;
+  model_version: string;
+  demo_only: true;
+}
+export interface PatientVitalsHistory {
+  patient_id: string;
+  items: PatientVitalRecord[];
+  count: number;
+  limit: number;
+  demo_only: true;
+  disclaimer: string;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers);
-  if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+  // JSON content type is only needed for requests with a body; setting it on
+  // GET requests can cause an unnecessary CORS preflight.
+  if (init?.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
   const res = await fetch(`${APP_CONFIG.apiBaseUrl}${path}`, {
     ...init,
     signal: AbortSignal.timeout(8000),
@@ -55,11 +94,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 async function get<T>(path: string): Promise<T> {
   return request<T>(path, { method: 'GET' });
 }
+
 export const api = {
-  listPatients: () => get('/api/v1/patients'),
-  getPatient: (id: string) => get(`/api/v1/patients/${encodeURIComponent(id)}`),
-  getVitals: (id: string) => get(`/api/v1/patients/${encodeURIComponent(id)}/vitals`),
-  getLatestVitals: (id: string) => get(`/api/v1/patients/${encodeURIComponent(id)}/vitals/latest`),
+  listPatients: (limit = 100) =>
+    get<BackendPatientList>(`/api/v1/patients?limit=${new URLSearchParams({ limit: String(limit) }).get('limit')}`),
+  getPatient: (id: string) =>
+    get<BackendPatientSummary>(`/api/v1/patients/${encodeURIComponent(id)}`),
+  getVitals: (id: string, limit = 100) =>
+    get<PatientVitalsHistory>(`/api/v1/patients/${encodeURIComponent(id)}/vitals?limit=${limit}`),
+  getLatestVitals: (id: string) =>
+    get<PatientVitalRecord>(`/api/v1/patients/${encodeURIComponent(id)}/vitals/latest`),
   predictRisk: (input: RiskPredictionInput) =>
     request<RiskPredictionResult>('/api/v1/risk/predict', { method: 'POST', body: JSON.stringify(input) }),
   listObservations: (patientId?: string, limit = 10) => {
@@ -67,5 +111,6 @@ export const api = {
     if (patientId) params.set('patient_id', patientId);
     return get<ObservationHistory>(`/api/v1/observations?${params.toString()}`);
   },
-  health: () => get<{ status: string; model_version: string; demo_only: boolean }>('/health'),
+  health: () =>
+    get<{ status: string; model_version: string; demo_only: boolean; storage_backend?: 'sqlite' | 'postgresql'; persistent_storage_configured?: boolean }>('/health'),
 };
