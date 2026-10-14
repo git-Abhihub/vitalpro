@@ -57,6 +57,49 @@ export interface PatientProgress {
   last_observed_at: string | null;
   description: string;
 }
+export interface SyntheticCondition {
+  name: string;
+  status: string;
+  noted_on: string;
+  note: string;
+  source: string;
+}
+export interface SyntheticLabResult {
+  test_id: string;
+  name: string;
+  panel: string;
+  result: number;
+  unit: string;
+  illustrative_band: string;
+  collected_at: string;
+  source: string;
+}
+export interface SyntheticPatientProfile {
+  patient_id: string;
+  full_name: string;
+  age: number | null;
+  sex: string;
+  blood_group: string;
+  height_cm: number;
+  weight_kg: number;
+  ward: string;
+  bed: string;
+  admission_date: string;
+  last_reviewed_at: string;
+  admission_reason: string;
+  conditions: SyntheticCondition[];
+  past_medical_history: string[];
+  medications: string[];
+  allergies: string[];
+  procedures: string[];
+  family_history: string[];
+  social_history: string;
+  care_notes: string[];
+  test_results: SyntheticLabResult[];
+  profile_notice: string;
+  demo_only: true;
+  clinically_validated: false;
+}
 export interface BackendPatientSummary {
   patient_id: string;
   age: number | null;
@@ -67,6 +110,7 @@ export interface BackendPatientSummary {
   latest_prediction: RiskPredictionResult;
   model_version: string;
   progress?: PatientProgress;
+  profile?: SyntheticPatientProfile;
   demo_only: true;
 }
 export interface BackendAlert {
