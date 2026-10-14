@@ -15,6 +15,7 @@ import { useSimulation } from '../store/useSimulation.ts';
 import { DataQualityPanel } from '../components/dashboard/DataQualityPanel.tsx';
 import { BackendObservationHistory } from '../components/dashboard/BackendObservationHistory.tsx';
 import { BackendPatientDirectory } from '../components/dashboard/BackendPatientDirectory.tsx';
+import { SyntheticMonitorStream } from '../components/dashboard/SyntheticMonitorStream.tsx';
 
 export function DashboardPage() {
   const { patients, risks, latest, alerts, tick, running, dataSource } = useSimulation();
@@ -39,6 +40,7 @@ export function DashboardPage() {
         <PageHeader eyebrow="Backend API" title="Persisted Patient Monitoring"
           subtitle="This view uses stored observations from the backend. API errors remain visible; local simulator fixtures are not substituted."
           crumbs={[{ label: 'Dashboard' }]} />
+        <SyntheticMonitorStream />
         <BackendPatientDirectory />
         <DataQualityPanel />
         <BackendObservationHistory />

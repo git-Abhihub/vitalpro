@@ -56,6 +56,35 @@ describe('backend API client', () => {
     expect(JSON.parse(String(init.body))).toEqual(input);
   });
 
+  it('submits a synthetic monitor sample with scenario and step', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        patient_id: 'DEMO-LIVE-001',
+        observation_id: 91,
+        created_at: '2026-10-14T11:00:00Z',
+        risk_score: 18,
+        risk_level: 'low',
+        model_probability: 0.18,
+        factors: [],
+        model_version: 'synthetic-test',
+        demo_only: true,
+        disclaimer: 'Synthetic only.',
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const sample = { patient_id: 'DEMO-LIVE-001', scenario: 'worsening' as const, step: 4 };
+
+    const result = await api.submitDemoObservation(sample);
+
+    expect(result.observation_id).toBe(91);
+    expect(fetchMock.mock.calls[0][0]).toBe(`${APP_CONFIG.apiBaseUrl}/api/v1/demo/observations`);
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.method).toBe('POST');
+    expect(new Headers(init.headers).get('Content-Type')).toBe('application/json');
+    expect(JSON.parse(String(init.body))).toEqual(sample);
+  });
+
   it('propagates backend errors instead of silently returning demo data', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
