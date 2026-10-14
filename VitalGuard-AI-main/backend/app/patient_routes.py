@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Query
 
+from .synthetic_profiles import build_synthetic_profile
 from .storage import (
     get_latest_observation,
     list_alert_audit,
@@ -47,11 +48,15 @@ def _progress(records: list[dict]) -> dict:
     }
 
 
-def _summary(item: dict, progress_records: list[dict] | None = None) -> dict:
+def _summary(
+    item: dict,
+    progress_records: list[dict] | None = None,
+    include_profile: bool = False,
+) -> dict:
     record = item["record"]
     inputs = record["inputs"]
     records = progress_records if progress_records is not None else [record]
-    return {
+    summary = {
         "patient_id": record["patient_id"],
         "age": inputs.get("age"),
         "latest_observation_id": record["id"],
@@ -63,6 +68,15 @@ def _summary(item: dict, progress_records: list[dict] | None = None) -> dict:
         "progress": _progress(records),
         "demo_only": True,
     }
+    if include_profile:
+        first_observed_at = records[0]["created_at"] if records else record["created_at"]
+        summary["profile"] = build_synthetic_profile(
+            patient_id=record["patient_id"],
+            age=inputs.get("age"),
+            first_observed_at=first_observed_at,
+            last_observed_at=record["created_at"],
+        )
+    return summary
 
 
 def _vital_item(record: dict) -> dict:
@@ -109,6 +123,7 @@ def patient_detail(patient_id: str):
     return _summary(
         {"record": latest, "observation_count": count},
         samples.get(patient_id, []),
+        include_profile=True,
     )
 
 
