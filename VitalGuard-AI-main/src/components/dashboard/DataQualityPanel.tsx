@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Clock3, RefreshCw, ShieldAlert } from 'lucide-react';
 import { APP_CONFIG } from '../../services/config.ts';
+import { useBackendLiveEvents } from '../../hooks/useBackendLiveEvents.ts';
+import type { LiveEvent } from '../../services/liveEvents.ts';
 
 type QualityItem = {
   patient_id: string;
@@ -44,6 +46,11 @@ export function DataQualityPanel() {
       setLoading(false);
     }
   }, []);
+
+  const handleLiveEvent = useCallback((event: LiveEvent) => {
+    if (event.type === 'observation.created') void refresh();
+  }, [refresh]);
+  useBackendLiveEvents(handleLiveEvent);
 
   useEffect(() => {
     void refresh();

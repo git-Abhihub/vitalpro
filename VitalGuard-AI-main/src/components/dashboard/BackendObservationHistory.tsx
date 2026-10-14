@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Clock3, RefreshCw, History } from 'lucide-react';
 import { APP_CONFIG } from '../../services/config.ts';
+import { useBackendLiveEvents } from '../../hooks/useBackendLiveEvents.ts';
+import type { LiveEvent } from '../../services/liveEvents.ts';
 
 type RecordItem = {
   id: number;
@@ -35,6 +37,13 @@ export function BackendObservationHistory() {
       setLoading(false);
     }
   }, [patientId]);
+
+  const handleLiveEvent = useCallback((event: LiveEvent) => {
+    if (event.type !== 'observation.created') return;
+    if (patientId.trim() && event.patient_id !== patientId.trim()) return;
+    void load();
+  }, [load, patientId]);
+  useBackendLiveEvents(handleLiveEvent);
 
   useEffect(() => { void load(); }, [load]);
 

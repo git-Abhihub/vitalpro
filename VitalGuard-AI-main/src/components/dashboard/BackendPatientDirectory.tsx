@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Activity, Clock3, RefreshCw, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api, type BackendPatientList } from '../../services/api.ts';
+import { useBackendLiveEvents } from '../../hooks/useBackendLiveEvents.ts';
+import type { LiveEvent } from '../../services/liveEvents.ts';
 
 function fmtTimestamp(value: string) {
   const date = new Date(value);
@@ -27,6 +29,11 @@ export function BackendPatientDirectory() {
     }
   }, []);
 
+  const handleLiveEvent = useCallback((event: LiveEvent) => {
+    if (event.type === 'observation.created') void load();
+  }, [load]);
+  const liveStatus = useBackendLiveEvents(handleLiveEvent);
+
   useEffect(() => { void load(); }, [load]);
 
   return (
@@ -36,6 +43,10 @@ export function BackendPatientDirectory() {
           <p className="eyebrow flex items-center gap-1.5"><Users size={13} /> Persisted backend data</p>
           <h2 id="backend-patient-directory-heading" className="font-display text-xl font-extrabold mt-1">Backend patient observations</h2>
           <p className="text-xs text-slate-500 mt-1">Patient IDs are derived from synthetic observations saved through the API. This list is separate from the local simulator cohort.</p>
+          <p className="text-xs mt-2 flex items-center gap-2" aria-live="polite">
+            <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${liveStatus === 'connected' ? 'bg-emerald-500' : liveStatus === 'reconnecting' ? 'bg-amber-500' : 'bg-slate-400'}`} />
+            {liveStatus === 'connected' ? 'Live demo stream connected' : liveStatus === 'reconnecting' ? 'Reconnecting to live updates…' : liveStatus === 'connecting' ? 'Connecting to live updates…' : 'Live stream offline; manual refresh is available'}
+          </p>
         </div>
         <button className="btn-secondary" onClick={() => void load()} disabled={loading}>
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh
