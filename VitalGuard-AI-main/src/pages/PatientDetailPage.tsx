@@ -8,9 +8,8 @@ import { DetailHeader, riskDelta, vitalCards } from '../components/patients/Deta
 import { RiskPanel, News2Panel } from '../components/risk/RiskPanels.tsx';
 import { useSimulation } from '../store/useSimulation.ts';
 import { TrajCard } from './TrajCard.tsx';
-import { ExplainCard, VitalCharts, AlertList } from './DetailSections.tsx';
-import { BackendPatientTimeline } from '../components/patients/BackendPatientTimeline.tsx';
-import { BackendObservationTrends } from '../components/patients/BackendObservationTrends.tsx';
+import { ExplainCard, TimelineCard, AlertList } from './DetailSections.tsx';
+import { LocalPatientDetailExtras } from '../components/patients/LocalPatientDetailExtras.tsx';
 import { BackendPatientDetail } from '../components/patients/BackendPatientDetail.tsx';
 export function fmtAgo(iso: string): string {
   const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -57,10 +56,9 @@ export function PatientDetailPage() {
       </div>
       <TrajCard patientId={patient.id} />
       <ExplainCard patientId={patient.id} />
-      <VitalCharts patientId={patient.id} />
+      <LocalPatientDetailExtras patient={patient} readings={h} risk={r} />
+      <TimelineCard patientId={patient.id} />
       <AlertList patientId={patient.id} />
-      <BackendPatientTimeline patientId={patient.id} />
-      <BackendObservationTrends patientId={patient.id} />
     </Shell>
   );
 }
