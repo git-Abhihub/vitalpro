@@ -1,15 +1,24 @@
 name: Browser end-to-end tests
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'VitalGuard-AI-main/src/**'
+      - 'VitalGuard-AI-main/e2e/**'
+      - 'VitalGuard-AI-main/playwright.config.mjs'
+      - 'VitalGuard-AI-main/package.json'
+      - 'VitalGuard-AI-main/package-lock.json'
+      - 'VitalGuard-AI-main/.github/workflows/e2e.yml'
   push:
     branches: [main]
     paths:
-      - 'src/**'
-      - 'e2e/**'
-      - 'playwright.config.mjs'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/e2e.yml'
+      - 'VitalGuard-AI-main/src/**'
+      - 'VitalGuard-AI-main/e2e/**'
+      - 'VitalGuard-AI-main/playwright.config.mjs'
+      - 'VitalGuard-AI-main/package.json'
+      - 'VitalGuard-AI-main/package-lock.json'
+      - 'VitalGuard-AI-main/.github/workflows/e2e.yml'
   workflow_dispatch:
 
 permissions:
@@ -19,12 +28,16 @@ jobs:
   browser-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: VitalGuard-AI-main
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: VitalGuard-AI-main/package-lock.json
       - run: npm ci
       - name: Install Playwright for CI
         run: npm install --no-save --package-lock=false @playwright/test@1.56.1
@@ -38,12 +51,16 @@ jobs:
     needs: browser-e2e
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: VitalGuard-AI-main
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: VitalGuard-AI-main/package-lock.json
       - run: npm ci
       - name: Install Playwright for CI
         run: npm install --no-save --package-lock=false @playwright/test@1.56.1
