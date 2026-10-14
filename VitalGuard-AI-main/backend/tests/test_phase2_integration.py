@@ -55,6 +55,22 @@ def test_patient_directory_and_vitals_are_derived_from_saved_records(client):
     assert detail.json()["age"] == 58
     assert detail.json()["progress"]["sample_count"] == 2
 
+    profile = detail.json()["profile"]
+    assert profile["patient_id"] == "DEMO-PHASE2-001"
+    assert profile["full_name"]
+    assert profile["age"] == 58
+    assert profile["demo_only"] is True
+    assert profile["clinically_validated"] is False
+    assert "fictional" in profile["profile_notice"].lower()
+    assert profile["conditions"]
+    assert profile["medications"]
+    assert profile["allergies"]
+    assert len(profile["test_results"]) >= 6
+    assert all("illustrative_low" in test and "illustrative_high" in test for test in profile["test_results"])
+    # Profile fixtures are stable for a patient ID across reloads.
+    repeated_profile = client.get("/api/v1/patients/DEMO-PHASE2-001").json()["profile"]
+    assert repeated_profile == profile
+
     history = client.get("/api/v1/patients/DEMO-PHASE2-001/vitals?limit=100")
     assert history.status_code == 200
     assert len(history.json()["items"]) == 2
