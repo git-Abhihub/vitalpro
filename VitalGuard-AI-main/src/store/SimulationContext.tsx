@@ -6,6 +6,7 @@ import type { ToastMsg, ToastSeverity } from './simInit.ts';
 import { freshSnapshot } from './snapshot.ts';
 
 import { demoDataService } from '../services/demoDataService.ts';
+import { APP_CONFIG } from '../services/config.ts';
 import { nextReading, nextRisk, news2For, riskLevelFor } from '../services/simulation.ts';
 const GAP = { slow: 4000, normal: 2000, fast: 1000 };
 export function SimulationProvider({ children }: { children: ReactNode }) {
@@ -25,7 +26,13 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
   const [tick, setTick] = useState(0);
   const [speed, setSpeed] = useState<'slow'|'normal'|'fast'>('normal');
   const [multiplier, setMultiplier] = useState<1|2>(1);
-  const [dataSource, setDataSource] = useState<'demo'|'api'>('demo');
+  const [dataSource, setDataSource] = useState<'demo'|'api'>(() => {
+    try {
+      const saved = localStorage.getItem('vg-data-source');
+      if (saved === 'demo' || saved === 'api') return saved;
+    } catch { /* storage may be unavailable */ }
+    return APP_CONFIG.demoMode ? 'demo' : 'api';
+  });
   const [theme, setThemeState] = useState<'light'|'dark'>(() => (localStorage.getItem('vg-theme') as 'light'|'dark') || 'light');
   const [lastRefresh, setLastRefresh] = useState(() => new Date().toISOString());
 
@@ -38,6 +45,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => { document.documentElement.classList.toggle('dark', theme === 'dark'); }, [theme]);
   useEffect(() => { try { localStorage.setItem('vg-alerts', JSON.stringify(alerts)); } catch { /*noop*/ } }, [alerts]);
+  useEffect(() => { try { localStorage.setItem('vg-data-source', dataSource); } catch { /*noop*/ } }, [dataSource]);
   const push = useCallback((title: string, message: string, severity: ToastSeverity = 'high', patientId?: string) => {
     const id = idRef.current++;
     setToasts((t) => [...t.slice(-4), { id, title, message, severity, at: new Date().toISOString(), patientId }]);

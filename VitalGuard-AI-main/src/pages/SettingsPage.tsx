@@ -38,7 +38,7 @@ export function SettingsPage() {
       <div className="mt-4 grid lg:grid-cols-2 gap-4 items-start">
         <SectionCard eyebrow="Data" title="Data source" hint="Where patient data comes from" label="Environment">
           <Seg options={['demo', 'api'] as const} value={dataSource} onPick={setDataSource} label="Data source" />
-          <p className="text-xs text-slate-500 mt-3 flex items-start gap-1.5"><Database size={13} aria-hidden className="mt-0.5 shrink-0" />Local synthetic set or backend API with automatic fallback. API base: <span className="font-mono">{APP_CONFIG.apiBaseUrl}</span></p>
+          <p className="text-xs text-slate-500 mt-3 flex items-start gap-1.5"><Database size={13} aria-hidden className="mt-0.5 shrink-0" />Local simulator or persisted backend API records. Backend errors are shown explicitly; demo fixtures are not silently substituted. API base: <span className="font-mono">{APP_CONFIG.apiBaseUrl}</span></p>
           {dataSource === 'demo' && <div className="mt-3"><BackendOffline onUseDemo={() => setDataSource('demo')} /></div>}
         </SectionCard>
         <SectionCard eyebrow="Playback" title="Monitoring" hint="Live signal playback" label="Simulation">
@@ -70,7 +70,7 @@ export function SettingsPage() {
         <SectionCard eyebrow="Build" title="System information" hint="Build and connection state" label="System information">
           <dl className="grid sm:grid-cols-2 gap-3 text-sm">
             <div className="rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/50 dark:border-white/[0.06] p-3"><dt className="eyebrow">Frontend version</dt><dd className="font-bold mt-1">{APP_CONFIG.version}</dd></div>
-            <div className="rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/50 dark:border-white/[0.06] p-3"><dt className="eyebrow">API mode</dt><dd className="font-bold mt-1">{dataSource === 'demo' ? 'Local dataset' : 'Backend API + fallback'}</dd></div>
+            <div className="rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/50 dark:border-white/[0.06] p-3"><dt className="eyebrow">API mode</dt><dd className="font-bold mt-1">{dataSource === 'demo' ? 'Local synthetic simulator' : 'Persisted backend API'}</dd></div>
             <div className="rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/50 dark:border-white/[0.06] p-3"><dt className="eyebrow">Environment</dt><dd className="font-bold mt-1 tabular-nums">{APP_CONFIG.env}</dd></div>
             <div className="rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/50 dark:border-white/[0.06] p-3"><dt className="eyebrow">Endpoints</dt><dd className="font-mono text-[11px] mt-1">/api/v1/model/evaluation · /api/v1/risk/explain</dd></div>
           </dl>

@@ -1,5 +1,5 @@
 const defaultApiBaseUrl = import.meta.env.PROD
-  ? 'https://vitalguard-risk-api.onrender.com'
+  ? 'https://vitalguard-risk-api-9vie.onrender.com'
   : 'http://localhost:8000';
 
 export const APP_CONFIG = {

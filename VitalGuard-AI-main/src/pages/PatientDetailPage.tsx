@@ -11,6 +11,7 @@ import { TrajCard } from './TrajCard.tsx';
 import { ExplainCard, VitalCharts, AlertList } from './DetailSections.tsx';
 import { BackendPatientTimeline } from '../components/patients/BackendPatientTimeline.tsx';
 import { BackendObservationTrends } from '../components/patients/BackendObservationTrends.tsx';
+import { BackendPatientDetail } from '../components/patients/BackendPatientDetail.tsx';
 export function fmtAgo(iso: string): string {
   const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
   if (m < 1) return 'Just now';
@@ -19,8 +20,9 @@ export function fmtAgo(iso: string): string {
 }
 export function PatientDetailPage() {
   const { patientId = '' } = useParams();
-  const { patients, latest, risks, histories } = useSimulation();
+  const { patients, latest, risks, histories, dataSource } = useSimulation();
   const patient = patients.find((p) => p.id === patientId);
+  if (dataSource === 'api') return <BackendPatientDetail patientId={patientId} />;
   if (!patient) {
     return (
       <Shell title="Patient not found" subtitle="Directory">

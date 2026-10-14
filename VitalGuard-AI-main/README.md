@@ -83,7 +83,7 @@ Copy `.env.example` to `.env` for local development. Vite variables prefixed wit
 - SQLAlchemy storage adapter supports local SQLite and PostgreSQL when `DATABASE_URL` is configured. A hosted PostgreSQL instance is not yet confirmed in the live deployment.
 - WebSocket event delivery for persisted observations and alerts, with a reconnecting frontend client.
 - Persistent demo alert lifecycle (open, acknowledged, resolved) with audit trail.
-- Dashboard includes backend alert operations, observation quality, and persisted prediction history. Patient detail includes backend observation/alert/audit timeline and descriptive trends. Patient cohort, vital charts and analytics still use local synthetic fixtures.
+- Settings can switch between the local simulator and persisted backend API mode; the selected mode persists across refreshes, and API errors do not silently fall back to local data. In API mode, dashboard/patient-directory and patient-detail views show persisted backend patient summaries, vital history, observation/alert/audit timeline, data quality and descriptive trends. The local simulator cohort, risk charts and analytics still use local synthetic fixtures.
 - Interactive model evaluation and coefficient-contribution workbench in Settings.
 - Source-documented NEWS2 parameter scoring demo endpoint (`POST /api/v1/scores/news2`) and Settings calculator; this is not a clinically validated or approved implementation.
 - Unified persisted patient timeline (`GET /api/v1/patients/{patient_id}/timeline`) and descriptive trend endpoint (`GET /api/v1/observations/trends?patient_id=...`).
@@ -136,19 +136,23 @@ backend/app/
   schemas.py           Validated API request/response schemas
   simulator.py         Deterministic fictional observation scenarios
   simulator_routes.py  Demo observation ingestion endpoint
-  timeline_routes.py   Persisted patient timeline
-  trend_routes.py      Descriptive observation trends
+  patient_routes.py   Persisted patient directory, vitals and timeline
+  analytics_routes.py Observation trend and data-quality endpoints
+  alert_routes.py     Alert lifecycle and audit API
+  model_routes.py     Synthetic evaluation and coefficient contributions
+  live.py             Single-process WebSocket event hub
   news2.py             NEWS2 parameter scoring demonstration
   storage.py           SQLite/PostgreSQL storage adapter
 backend/tests/
   test_api.py
   test_simulator.py
+  test_phase2_integration.py
 src/
   data/                Synthetic frontend fixtures
   pages/               Dashboard and feature pages
   services/            API and demo data services
   store/               Frontend state
-  test/                Frontend tests
+  test/                Frontend tests, including API-client integration checks
 docs/
   REALTIME_DEMO_ROADMAP.md
 ```
@@ -169,6 +173,10 @@ Run `npm run smoke:api` to check health, model metadata, frontend CORS preflight
 - Script: `scripts/smoke-test.mjs`
 - Run via GitHub Actions → Live API smoke test → Run workflow.
 - The workflow creates synthetic demo records; never send real patient data.
+
+## Phase 2 integration report
+
+See [PHASE2_INTEGRATION_REPORT.md](PHASE2_INTEGRATION_REPORT.md) for the patient API integration, alert lifecycle and audit events, WebSocket fan-out, analytics, API client tests, CI results, and current deployment blockers.
 
 ## Roadmap
 

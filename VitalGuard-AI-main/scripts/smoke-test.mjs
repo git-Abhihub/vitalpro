@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-const baseUrl = (process.env.VITALGUARD_API_URL || 'https://vitalguard-risk-api.onrender.com').replace(/\/$/, '');
+const baseUrl = (process.env.VITALGUARD_API_URL || 'https://vitalguard-risk-api-9vie.onrender.com').replace(/\/$/, '');
 const timeoutMs = 20_000;
 const coldStartTimeoutMs = 60_000;
 
@@ -100,7 +100,7 @@ async function main() {
   const preflight = await fetch(`${baseUrl}/api/v1/risk/predict`, {
     method: 'OPTIONS',
     headers: {
-      Origin: 'https://vitalguard-ai-g215.onrender.com',
+      Origin: 'https://vitalguard-ai-frontend.onrender.com',
       'Access-Control-Request-Method': 'POST',
       'Access-Control-Request-Headers': 'content-type',
     },
