@@ -14,13 +14,16 @@ VitalGuard AI is a prototype for exploring patient-observation monitoring, synth
 
 ## Verification status
 
-**Phase 2 has been merged into `main` and deployed to Render.** The main-branch CI passes: 32 frontend tests, 25 backend tests, frontend type-check/lint, and production build. The live Render smoke workflow also passed, including the frontend asset check and backend regression checks for synthetic predictions, history, NEWS2 demo scoring, trends, data quality, alerts/audit, and patient timelines.
+**Phases 2–4 are merged into `main`; the Phase 4 frontend bundle is deployed to Render.** The latest main CI passed frontend type-check, tests and production build plus backend tests. The latest Render smoke workflow passed frontend asset checks and backend regression checks for synthetic predictions, history, NEWS2 demo scoring, trends, data quality, alerts/audit, and patient timelines.
 
-- [Latest successful main CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217294)
-- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217384)
-- [Merged Phase 2 pull request](https://github.com/git-Abhihub/vitalpro/pull/2)
+- [Latest successful main CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38558871128)
+- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38558871163)
+- [Phase 2 API integration pull request](https://github.com/git-Abhihub/vitalpro/pull/2)
+- [Phase 3 live dashboard updates pull request](https://github.com/git-Abhihub/vitalpro/pull/3)
+- [Phase 4 synthetic monitor stream pull request](https://github.com/git-Abhihub/vitalpro/pull/4)
 - [Phase 1 stabilisation report](VitalGuard-AI-main/PHASE1_AUDIT.md)
 - [Phase 2 integration report](VitalGuard-AI-main/PHASE2_INTEGRATION_REPORT.md)
+- [Phase 4 synthetic monitor stream report](VitalGuard-AI-main/PHASE4_SYNTHETIC_STREAM_REPORT.md)
 
 ## Current deployment limitation
 
