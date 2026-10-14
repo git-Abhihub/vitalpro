@@ -14,21 +14,19 @@ VitalGuard AI is a prototype for exploring patient-observation monitoring, synth
 
 ## Verification status
 
-Deployment smoke tests last passed on 2026-10-14 against the public Render URLs below; the links are stable unless the Render services are recreated.
+**Phase 2 has been merged into `main` and deployed to Render.** The main-branch CI passes: 32 frontend tests, 25 backend tests, frontend type-check/lint, and production build. The live Render smoke workflow also passed, including the frontend asset check and backend regression checks for synthetic predictions, history, NEWS2 demo scoring, trends, data quality, alerts/audit, and patient timelines.
 
-The current `main` deployment's Phase 1 checks passed **28 frontend tests** and **17 backend tests**. The Phase 2 integration branch has since passed **32 frontend tests**, **25 backend tests**, type-checking, and production build. Phase 2 changes are not live until they are merged and Render redeploys.
-
-- [Successful Phase 1 CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954917)
-- [Successful Phase 1 Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954959)
-- [Phase 2 integration CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38550837702)
+- [Latest successful main CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217294)
+- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217384)
+- [Merged Phase 2 pull request](https://github.com/git-Abhihub/vitalpro/pull/2)
 - [Phase 1 stabilisation report](VitalGuard-AI-main/PHASE1_AUDIT.md)
 - [Phase 2 integration report](VitalGuard-AI-main/PHASE2_INTEGRATION_REPORT.md)
 
 ## Current deployment limitation
 
-The backend currently uses SQLite on the hosted service's local filesystem. A Render PostgreSQL database has been provisioned but has **not yet been linked to the backend**; hosted demo history may be lost across restarts or redeploys. PostgreSQL persistence will be connected and tested in a subsequent phase.
+The backend is **still using SQLite on the hosted service's local filesystem**. A Render PostgreSQL database has been provisioned but is not linked to the backend's `DATABASE_URL` yet. Hosted demo history may therefore be lost across restarts or redeploys. PostgreSQL linkage and a post-link smoke test are the remaining deployment tasks.
 
-The application is currently deployed in synthetic demo mode. Do not enter real patient data or use this prototype to diagnose, triage, or guide treatment.
+The frontend is configured to start in backend API mode; users can switch to local synthetic demo data in Settings. Do not enter real patient data or use this prototype to diagnose, triage, or guide treatment.
 
 ## Project sources
 
