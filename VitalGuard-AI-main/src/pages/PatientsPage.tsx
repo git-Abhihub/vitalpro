@@ -9,10 +9,11 @@ import { EmptyState } from '../components/ui/States.tsx';
 import { FilterBar, useFilterState } from '../components/patients/FilterBar.tsx';
 import { PatientRows, PatientCards } from '../components/patients/Directory.tsx';
 import { useSimulation } from '../store/useSimulation.ts';
+import { BackendPatientDirectory } from '../components/dashboard/BackendPatientDirectory.tsx';
 
 const PAGE = 6;
 export function PatientsPage() {
-  const { patients, risks, latest } = useSimulation();
+  const { patients, risks, latest, dataSource } = useSimulation();
   const [filters, setFilters] = useFilterState();
   const [view, setView] = useState<'table' | 'cards'>('table');
   const [page, setPage] = useState(0);
@@ -29,6 +30,16 @@ export function PatientsPage() {
     });
     return out;
   }, [patients, risks, latest, filters]);
+  if (dataSource === 'api') {
+    return (
+      <Shell title="Backend Patients" subtitle="Persisted synthetic observations">
+        <PageHeader eyebrow="Backend API" title="Patient Directory"
+          subtitle="Only patient IDs with observations saved through FastAPI appear here."
+          crumbs={[{ label: 'Dashboard', to: '/dashboard' }, { label: 'Patients' }]} />
+        <BackendPatientDirectory />
+      </Shell>
+    );
+  }
   const pages = Math.max(1, Math.ceil(rows.length / PAGE));
   const safePage = Math.min(page, pages - 1);
   const slice = rows.slice(safePage * PAGE, safePage * PAGE + PAGE);
