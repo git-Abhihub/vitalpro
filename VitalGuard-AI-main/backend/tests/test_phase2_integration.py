@@ -192,3 +192,15 @@ def test_live_websocket_receives_persisted_observation_event(client):
         assert event["event_id"] == response.json()["observation_id"]
         websocket.send_text("ping")
         assert websocket.receive_json()["type"] == "pong"
+
+def test_news2_scale2_spo2_bands():
+    from app.news2 import _spo2_scale2
+
+    assert _spo2_scale2(83) == 3
+    assert _spo2_scale2(84) == 2
+    assert _spo2_scale2(86) == 1
+    assert _spo2_scale2(88) == 0
+    assert _spo2_scale2(92) == 0
+    assert _spo2_scale2(93) == 1
+    assert _spo2_scale2(95) == 2
+    assert _spo2_scale2(97) == 3
