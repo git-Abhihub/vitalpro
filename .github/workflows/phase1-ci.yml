@@ -1,8 +1,8 @@
-name: Phase 1 - Project Stabilization
+name: VitalGuard CI
 
 on:
   push:
-    branches: [main, phase-1-stabilization]
+    branches: [main, phase-1-stabilization, phase-2-api-integration]
   pull_request:
     branches: [main]
     paths:
