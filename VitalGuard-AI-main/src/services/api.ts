@@ -97,7 +97,7 @@ async function get<T>(path: string): Promise<T> {
 
 export const api = {
   listPatients: (limit = 100) =>
-    get<BackendPatientList>(`/api/v1/patients?limit=${new URLSearchParams({ limit: String(limit) }).get('limit')}`),
+    get<BackendPatientList>(`/api/v1/patients?limit=${limit}`),
   getPatient: (id: string) =>
     get<BackendPatientSummary>(`/api/v1/patients/${encodeURIComponent(id)}`),
   getVitals: (id: string, limit = 100) =>
