@@ -6,6 +6,8 @@ import { EmptyState } from '../ui/States.tsx';
 import { RiskBadge } from '../ui/Badges.tsx';
 import { api, type BackendPatientSummary, type PatientVitalsHistory } from '../../services/api.ts';
 import { BackendPatientTimeline } from './BackendPatientTimeline.tsx';
+import { PatientProfileSections } from './PatientProfileSections.tsx';
+import { PatientVitalsAnalytics } from './PatientVitalsAnalytics.tsx';
 import { BackendObservationTrends } from './BackendObservationTrends.tsx';
 
 function fmtTimestamp(value: string) {
@@ -67,15 +69,17 @@ export function BackendPatientDetail({ patientId }: { patientId: string }) {
     <Shell title={`Backend patient ${patientId}`} subtitle="Persisted synthetic API observations">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="eyebrow">Backend-sourced patient detail</p>
-          <h1 className="font-display text-2xl sm:text-3xl font-extrabold mt-1">{patientId}</h1>
-          <p className="text-sm text-slate-500 mt-1">Age {patient.age ?? 'not recorded'} · {patient.observation_count} saved observation(s)</p>
+          <p className="eyebrow">Full synthetic patient history</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold mt-1">{patient.profile?.full_name ?? patientId}</h1>
+          <p className="text-sm text-slate-500 mt-1">Patient ID {patientId} · Age {patient.age ?? 'not recorded'} · {patient.observation_count} saved observation(s) · fictional demo record</p>
         </div>
         <div className="flex gap-2">
           <button className="btn-secondary" onClick={() => void load()} disabled={loading}><RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh</button>
           <Link to="/dashboard" className="btn-secondary"><ArrowLeft size={14} /> Dashboard</Link>
         </div>
       </div>
+
+      {patient.profile && <PatientProfileSections profile={patient.profile} />}
 
       <section className="card mt-4 p-4 sm:p-5" aria-label="Latest backend observation">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -93,6 +97,8 @@ export function BackendPatientDetail({ patientId }: { patientId: string }) {
         </div>
         <p className="text-[11px] text-slate-400 mt-3 flex items-center gap-1.5"><Activity size={12} /> Model {patient.model_version}. This is a synthetic model output, not validated clinical risk.</p>
       </section>
+
+      <PatientVitalsAnalytics history={history} />
 
       <section className="card mt-4 p-4 sm:p-5" aria-labelledby="backend-history-heading">
         <h2 id="backend-history-heading" className="font-display text-xl font-extrabold">Saved observation history</h2>
