@@ -127,6 +127,22 @@ def patient_detail(patient_id: str):
     )
 
 
+@router.get("/patient-profiles/{patient_id}")
+def synthetic_patient_profile(
+    patient_id: str,
+    age: int | None = Query(default=None, ge=18, le=110),
+):
+    """Return a synthetic-only profile fixture without requiring saved observations."""
+    now = datetime.now().astimezone().isoformat()
+    profile = build_synthetic_profile(
+        patient_id=patient_id,
+        age=age,
+        first_observed_at=now,
+        last_observed_at=now,
+    )
+    return profile
+
+
 @router.get("/patients/{patient_id}/vitals")
 def patient_vitals(
     patient_id: str,
