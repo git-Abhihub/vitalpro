@@ -30,6 +30,11 @@ export interface ObservationRecord {
   prediction: RiskPredictionResult;
   model_version: string;
 }
+export interface DemoSimulationRequest {
+  patient_id: string;
+  scenario: 'stable' | 'worsening' | 'recovering';
+  step: number;
+}
 export interface ObservationHistory {
   items: ObservationRecord[];
   count: number;
@@ -106,6 +111,8 @@ export const api = {
     get<PatientVitalRecord>(`/api/v1/patients/${encodeURIComponent(id)}/vitals/latest`),
   predictRisk: (input: RiskPredictionInput) =>
     request<RiskPredictionResult>('/api/v1/risk/predict', { method: 'POST', body: JSON.stringify(input) }),
+  submitDemoObservation: (input: DemoSimulationRequest) =>
+    request<RiskPredictionResult>('/api/v1/demo/observations', { method: 'POST', body: JSON.stringify(input) }),
   listObservations: (patientId?: string, limit = 10) => {
     const params = new URLSearchParams({ limit: String(limit) });
     if (patientId) params.set('patient_id', patientId);
