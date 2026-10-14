@@ -128,3 +128,9 @@ jobs:
           console.log('Backend smoke passed: health, model metadata, CORS, prediction, and persisted history.');
           console.log(`API base: ${base}`);
           NODE
+
+      - name: Run full API regression smoke suite
+        working-directory: VitalGuard-AI-main
+        env:
+          VITALGUARD_API_URL: ${{ inputs.api_base_url || 'https://vitalguard-risk-api-9vie.onrender.com' }}
+        run: node scripts/smoke-test.mjs
