@@ -85,6 +85,12 @@ jobs:
             try {
               const { data } = await request('/health');
               if (data.status !== 'ok') throw new Error('health status is not ok');
+              if (data.storage_backend !== 'postgresql' || data.persistent_storage_configured !== true) {
+                throw new Error(`PostgreSQL persistence is not configured: ${JSON.stringify({
+                  storage_backend: data.storage_backend,
+                  persistent_storage_configured: data.persistent_storage_configured
+                })}`);
+              }
               ready = true;
               break;
             } catch (error) {
