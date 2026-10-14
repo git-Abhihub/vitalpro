@@ -82,6 +82,29 @@ def test_patient_directory_and_vitals_are_derived_from_saved_records(client):
     assert latest.json()["heart_rate"] == 95
 
 
+def test_synthetic_profile_can_be_created_without_persisted_observations(client):
+    response = client.get(
+        "/api/v1/patient-profiles/P-SIM-003",
+        params={"age": 67},
+    )
+    assert response.status_code == 200
+    profile = response.json()
+    assert profile["patient_id"] == "P-SIM-003"
+    assert profile["age"] == 67
+    assert profile["full_name"]
+    assert profile["demo_only"] is True
+    assert profile["clinically_validated"] is False
+    assert profile["conditions"]
+    assert profile["medications"]
+    assert profile["allergies"]
+    assert len(profile["test_results"]) == 8
+    assert all(
+        result["display_min"] < result["display_max"]
+        and result["illustrative_low"] <= result["illustrative_high"]
+        for result in profile["test_results"]
+    )
+
+
 def test_patient_endpoints_return_404_when_no_records_exist(client):
     assert client.get("/api/v1/patients/UNKNOWN-DEMO").status_code == 404
     assert client.get("/api/v1/patients/UNKNOWN-DEMO/vitals/latest").status_code == 404
