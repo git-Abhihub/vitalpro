@@ -199,6 +199,12 @@ export const api = {
     get<BackendPatientList>(`/api/v1/patients?limit=${limit}`),
   getPatient: (id: string) =>
     get<BackendPatientSummary>(`/api/v1/patients/${encodeURIComponent(id)}`),
+  getSyntheticProfile: (id: string, age?: number) => {
+    const params = new URLSearchParams();
+    if (age != null) params.set('age', String(age));
+    const suffix = params.size ? `?${params.toString()}` : '';
+    return get<SyntheticPatientProfile>(`/api/v1/patient-profiles/${encodeURIComponent(id)}${suffix}`);
+  },
   getVitals: (id: string, limit = 100) =>
     get<PatientVitalsHistory>(`/api/v1/patients/${encodeURIComponent(id)}/vitals?limit=${limit}`),
   getLatestVitals: (id: string) =>
