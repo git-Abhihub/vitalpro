@@ -14,13 +14,14 @@ The demo frontend and synthetic risk API are deployed on Render:
 - **Model metadata:** https://vitalguard-risk-api-9vie.onrender.com/api/v1/model/info
 - **Render deployment smoke workflow:** https://github.com/git-Abhihub/vitalpro/actions/workflows/render-smoke.yml
 
-Phases 2–4 are merged into `main`. Phase 5 adds persisted per-patient vital progress and a backend-backed Analytics view. The directory now shows each patient's latest vital readings, a recent synthetic-score sparkline/progress bar, sample count, last-observed time, and change from the previous score when history is available. In backend API mode, Analytics reads saved patient summaries, alert lifecycle, and data freshness from the backend instead of mixing in the local simulator cohort.
+Phases 2–4 are merged into `main`. Phase 5 adds per-patient vital progress and backend-backed cohort Analytics. Phase 6 adds a full synthetic patient-detail workspace for both saved backend patients and local simulator patients: fictional identity/demographics, condition and medical-history sections, mock medications/allergies/procedures, generated lab-style results, current vitals, chronological observations, and individual vital-trend charts with latest/minimum/mean/maximum and first-to-latest change summaries.
 
-- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991730) — frontend type-check, tests, production build and backend tests passed.
-- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991384) — live API progress-series and persisted-history checks passed.
+- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38587858799) — frontend type-check, tests, production build and backend tests passed.
+- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38587858853) — checks saved patient profile and lab result fields, unpersisted profile generation, two-sample progress, and persisted history.
 - [Phase 2 integration report](PHASE2_INTEGRATION_REPORT.md)
 - [Phase 4 synthetic monitor stream report](PHASE4_SYNTHETIC_STREAM_REPORT.md)
 - [Phase 5 patient progress and analytics report](PHASE5_PATIENT_PROGRESS_ANALYTICS.md)
+- [Phase 6 patient history and detail explorer report](PHASE6_PATIENT_HISTORY_EXPLORER.md)
 
 **Persistence:** the deployed backend uses Render PostgreSQL and the health/smoke checks verify this configuration and persisted synthetic prediction history. The current free database is scheduled to expire on **November 13, 2026**, so long-term storage beyond the free-instance expiry still needs a plan.
 
@@ -89,7 +90,7 @@ Copy `.env.example` to `.env` for local development. Vite variables prefixed wit
 - SQLAlchemy storage adapter supports local SQLite and PostgreSQL when `DATABASE_URL` is configured. A hosted PostgreSQL instance is not yet confirmed in the live deployment.
 - WebSocket event delivery for persisted observations and alerts, with a reconnecting frontend client.
 - Persistent demo alert lifecycle (open, acknowledged, resolved) with audit trail.
-- Settings can switch between the local simulator and persisted backend API mode; the selected mode persists across refreshes, and API errors do not silently fall back to local data. In API mode, the dashboard/patient directory and patient detail show persisted backend summaries, saved vital history, observation/alert/audit timeline, data quality and descriptive trends. The API-mode Analytics route now uses saved patient summaries, alert lifecycle and data-freshness endpoints; local simulator mode retains its local synthetic cohort analytics.
+- Settings can switch between the local simulator and persisted backend API mode; the selected mode persists across refreshes, and API errors do not silently fall back to local data. In API mode, the dashboard/patient directory and patient detail show persisted backend summaries, saved vital history, observation/alert/audit timeline, data quality and descriptive trends. The API-mode Analytics route uses saved patient summaries, alert lifecycle and data freshness. Both API-mode and local simulator patient detail views include a generated fictional profile, lab-style demo results, and visual time-series for each vital plus the synthetic model score.
 - Patient directory progress payload includes recent persisted risk-score, HR, SpO₂ and systolic BP series, score direction/delta and timestamps. The directory displays latest vital values, a score sparkline/progress bar, observation count and last observed time for each synthetic patient.
 - Interactive model evaluation and coefficient-contribution workbench in Settings.
 - Source-documented NEWS2 parameter scoring demo endpoint (`POST /api/v1/scores/news2`) and Settings calculator; this is not a clinically validated or approved implementation.
@@ -127,7 +128,7 @@ This is a one-observation-per-request simulator, not a continuous device feed. E
 
 ## Important limitations
 
-- Local simulator mode's patient cohort, vital charts, cohort analytics and some alert cards use local synthetic fixtures; the persisted backend mode is a separate synthetic observation cohort.
+- Local simulator observations are generated in browser memory; patient profile demographics, conditions, medical history, medications, allergies, notes, and lab-style results are synthetic UI fixtures and are not written as medical records. The persisted backend observation cohort is separate.
 - The model is a StandardScaler + LogisticRegression classifier trained on generated synthetic observations and heuristic labels. Its output is a demo signal, not a validated probability of clinical deterioration.
 - Model evaluation metrics describe agreement with synthetic heuristic labels only. Coefficient contributions are not SHAP explanations or causal attributions.
 - WebSocket fan-out is in-process and designed for a single backend instance. Identity/role controls and production operational safeguards remain deployment work. The hosted PostgreSQL instance is free and has a scheduled expiry date (November 13, 2026).
@@ -185,6 +186,10 @@ Run `npm run smoke:api` to check health, model metadata, frontend CORS preflight
 ## Phase 2 integration report
 
 See [PHASE2_INTEGRATION_REPORT.md](PHASE2_INTEGRATION_REPORT.md) for the patient API integration, alert lifecycle and audit events, WebSocket fan-out, analytics, API client tests, CI results, and current deployment blockers.
+
+## Patient history explorer
+
+See [PHASE6_PATIENT_HISTORY_EXPLORER.md](PHASE6_PATIENT_HISTORY_EXPLORER.md) for synthetic patient profiles, condition/history sections, illustrative lab result charts, individual vital graphs, descriptive statistics, endpoint details, tests and limitations.
 
 ## Roadmap
 
