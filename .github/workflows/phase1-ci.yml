@@ -2,7 +2,7 @@ name: Phase 1 - Project Stabilization
 
 on:
   push:
-    branches: [phase-1-stabilization]
+    branches: [main, phase-1-stabilization]
   pull_request:
     branches: [main]
     paths:
