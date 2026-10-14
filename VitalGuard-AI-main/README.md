@@ -14,14 +14,15 @@ The demo frontend and synthetic risk API are deployed on Render:
 - **Model metadata:** https://vitalguard-risk-api-9vie.onrender.com/api/v1/model/info
 - **Render deployment smoke workflow:** https://github.com/git-Abhihub/vitalpro/actions/workflows/render-smoke.yml
 
-Phases 2–4 are merged into `main`. Phase 4 adds a synthetic monitor stream panel to backend API mode; the frontend was successfully redeployed at commit `5db4023beab4e03f827a3d6767fc39882bb9b053`. The latest main CI and Render smoke test passed. Smoke coverage includes frontend assets, API health/model metadata, CORS, synthetic prediction/history, model evaluation/contributions, NEWS2 demo scoring, trend/data-quality endpoints, and alert/timeline APIs.
+Phases 2–4 are merged into `main`. Phase 5 adds persisted per-patient vital progress and a backend-backed Analytics view. The directory now shows each patient's latest vital readings, a recent synthetic-score sparkline/progress bar, sample count, last-observed time, and change from the previous score when history is available. In backend API mode, Analytics reads saved patient summaries, alert lifecycle, and data freshness from the backend instead of mixing in the local simulator cohort.
 
-- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38558871128)
-- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38558871163)
+- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38579449086) — frontend type-check, tests, production build and backend tests passed.
+- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38579449227) — live API progress-series and persisted-history checks passed.
 - [Phase 2 integration report](PHASE2_INTEGRATION_REPORT.md)
 - [Phase 4 synthetic monitor stream report](PHASE4_SYNTHETIC_STREAM_REPORT.md)
+- [Phase 5 patient progress and analytics report](PHASE5_PATIENT_PROGRESS_ANALYTICS.md)
 
-**Persistence limitation:** the backend is still using SQLite on the hosted service filesystem. A Render PostgreSQL database is provisioned but has not been linked to the backend's `DATABASE_URL` yet; hosted demo history may be lost across restarts or redeploys. Link it in the backend service's private Render environment settings and rerun the smoke test before calling hosted persistence durable.
+**Persistence:** the deployed backend uses Render PostgreSQL and the health/smoke checks verify this configuration and persisted synthetic prediction history. The current free database is scheduled to expire on **November 13, 2026**, so long-term storage beyond the free-instance expiry still needs a plan.
 
 The frontend starts in backend API mode, with local synthetic demo mode still selectable in Settings. The model and NEWS2 demonstration are not clinically validated and must not be used for diagnosis, triage, or treatment decisions.
 
@@ -88,7 +89,8 @@ Copy `.env.example` to `.env` for local development. Vite variables prefixed wit
 - SQLAlchemy storage adapter supports local SQLite and PostgreSQL when `DATABASE_URL` is configured. A hosted PostgreSQL instance is not yet confirmed in the live deployment.
 - WebSocket event delivery for persisted observations and alerts, with a reconnecting frontend client.
 - Persistent demo alert lifecycle (open, acknowledged, resolved) with audit trail.
-- Settings can switch between the local simulator and persisted backend API mode; the selected mode persists across refreshes, and API errors do not silently fall back to local data. In API mode, dashboard/patient-directory and patient-detail views show persisted backend patient summaries, vital history, observation/alert/audit timeline, data quality and descriptive trends. The local simulator cohort, risk charts and analytics still use local synthetic fixtures.
+- Settings can switch between the local simulator and persisted backend API mode; the selected mode persists across refreshes, and API errors do not silently fall back to local data. In API mode, the dashboard/patient directory and patient detail show persisted backend summaries, saved vital history, observation/alert/audit timeline, data quality and descriptive trends. The API-mode Analytics route now uses saved patient summaries, alert lifecycle and data-freshness endpoints; local simulator mode retains its local synthetic cohort analytics.
+- Patient directory progress payload includes recent persisted risk-score, HR, SpO₂ and systolic BP series, score direction/delta and timestamps. The directory displays latest vital values, a score sparkline/progress bar, observation count and last observed time for each synthetic patient.
 - Interactive model evaluation and coefficient-contribution workbench in Settings.
 - Source-documented NEWS2 parameter scoring demo endpoint (`POST /api/v1/scores/news2`) and Settings calculator; this is not a clinically validated or approved implementation.
 - Unified persisted patient timeline (`GET /api/v1/patients/{patient_id}/timeline`) and descriptive trend endpoint (`GET /api/v1/observations/trends?patient_id=...`).
@@ -121,14 +123,14 @@ curl -X POST http://localhost:8000/api/v1/demo/observations \
 History can be inspected at:
 `GET /api/v1/observations?patient_id=DEMO-LIVE-001`
 
-This is a one-observation-per-request simulator, not a continuous device feed. Each request creates a new observation; requests are not idempotent. The backend broadcasts saved observations and alerts over `/api/v1/live`, and the dashboard includes backend alert, history, timeline and trend views. Not all patient cards/charts are API-backed. Durable hosted PostgreSQL configuration remains outstanding.
+This is a one-observation-per-request simulator, not a continuous device feed. Each request creates a new observation; requests are not idempotent. The backend broadcasts saved observations and alerts over `/api/v1/live`. API-mode patient directory progress, patient detail, and cohort analytics use persisted backend records; local simulator mode still uses local synthetic fixtures.
 
 ## Important limitations
 
-- Patient directory, vital charts, cohort analytics and some local alert cards still use local synthetic fixtures; backend history and alert operations are separate views.
+- Local simulator mode's patient cohort, vital charts, cohort analytics and some alert cards use local synthetic fixtures; the persisted backend mode is a separate synthetic observation cohort.
 - The model is a StandardScaler + LogisticRegression classifier trained on generated synthetic observations and heuristic labels. Its output is a demo signal, not a validated probability of clinical deterioration.
 - Model evaluation metrics describe agreement with synthetic heuristic labels only. Coefficient contributions are not SHAP explanations or causal attributions.
-- WebSocket fan-out is in-process and designed for a single backend instance. Hosted PostgreSQL, identity/role controls, and production operational safeguards remain deployment work.
+- WebSocket fan-out is in-process and designed for a single backend instance. Identity/role controls and production operational safeguards remain deployment work. The hosted PostgreSQL instance is free and has a scheduled expiry date (November 13, 2026).
 - The NEWS2 scoring endpoint follows parameter bands from the RCP chart for demonstration, but the implementation is not clinically validated or approved. The existing local NEWS2-like display also remains a separate synthetic fixture.
 - No clinical performance, safety, regulatory or real-device integration is claimed.
 - Do not use real patient data or use this prototype to diagnose, triage, or make treatment decisions.
