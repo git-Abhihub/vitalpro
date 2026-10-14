@@ -14,9 +14,10 @@ import { RISK_BANDS } from '../theme/tokens.ts';
 import { useSimulation } from '../store/useSimulation.ts';
 import { DataQualityPanel } from '../components/dashboard/DataQualityPanel.tsx';
 import { BackendObservationHistory } from '../components/dashboard/BackendObservationHistory.tsx';
+import { BackendPatientDirectory } from '../components/dashboard/BackendPatientDirectory.tsx';
 
 export function DashboardPage() {
-  const { patients, risks, latest, alerts, tick, running } = useSimulation();
+  const { patients, risks, latest, alerts, tick, running, dataSource } = useSimulation();
   const [filters, setFilters] = useFilterState();
   const filtered = useMemo(() => filterCohort(patients, risks, filters), [patients, risks, filters]);
   const dist = useMemo(() => {
@@ -32,6 +33,19 @@ export function DashboardPage() {
   const hero = risks['P-SIM-003'];
   const heroVitals = latest['P-SIM-003'];
   const heroPatient = patients.find((p) => p.id === 'P-SIM-003');
+  if (dataSource === 'api') {
+    return (
+      <Shell title="Backend Monitoring" subtitle="Persisted synthetic observations from FastAPI">
+        <PageHeader eyebrow="Backend API" title="Persisted Patient Monitoring"
+          subtitle="This view uses stored observations from the backend. API errors remain visible; local simulator fixtures are not substituted."
+          crumbs={[{ label: 'Dashboard' }]} />
+        <BackendPatientDirectory />
+        <DataQualityPanel />
+        <BackendObservationHistory />
+        <p className="text-[11px] text-slate-400 mt-4">Synthetic data only. The current risk model is not clinically validated.</p>
+      </Shell>
+    );
+  }
   return (
     <Shell title="Command Center" subtitle="Real-time clinical intelligence overview">
       <section className="clinical-panel relative overflow-hidden rounded-[24px] p-6 sm:p-8 lg:p-9" aria-label="Clinical intelligence overview">
