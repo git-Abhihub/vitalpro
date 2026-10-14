@@ -194,6 +194,55 @@ def list_patient_summaries(limit: int = 100) -> list[dict[str, Any]]:
         engine.dispose()
 
 
+
+def list_patient_progress_samples(
+    patient_ids: list[str],
+    per_patient_limit: int = 12,
+) -> dict[str, list[dict[str, Any]]]:
+    """Return recent persisted observations for each requested patient in one query.
+
+    The result is ordered oldest-to-newest per patient and is intended for
+    descriptive synthetic trend displays, not clinical interpretation.
+    """
+    if not patient_ids:
+        return {}
+    bounded_limit = max(1, min(int(per_patient_limit), 50))
+    engine = _engine()
+    try:
+        _METADATA.create_all(engine)
+        ranked = (
+            select(
+                _OBSERVATIONS.c.id,
+                _OBSERVATIONS.c.patient_id,
+                _OBSERVATIONS.c.created_at,
+                _OBSERVATIONS.c.input_json,
+                _OBSERVATIONS.c.prediction_json,
+                _OBSERVATIONS.c.model_version,
+                func.row_number()
+                .over(
+                    partition_by=_OBSERVATIONS.c.patient_id,
+                    order_by=_OBSERVATIONS.c.id.desc(),
+                )
+                .label("row_num"),
+            )
+            .where(_OBSERVATIONS.c.patient_id.in_(patient_ids))
+            .subquery()
+        )
+        query = (
+            select(ranked)
+            .where(ranked.c.row_num <= bounded_limit)
+            .order_by(ranked.c.patient_id.asc(), ranked.c.id.asc())
+        )
+        grouped: dict[str, list[dict[str, Any]]] = {patient_id: [] for patient_id in patient_ids}
+        with engine.connect() as connection:
+            rows = connection.execute(query).mappings().all()
+        for row in rows:
+            patient_id = row["patient_id"]
+            grouped.setdefault(patient_id, []).append(_serialize_observation(row))
+        return grouped
+    finally:
+        engine.dispose()
+
 def create_alert(
     patient_id: str,
     severity: str,
