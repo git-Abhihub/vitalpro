@@ -52,3 +52,23 @@ The backend run reported one non-fatal Starlette/httpx deprecation warning. The 
 - Server-side identity/role controls and production clinical safeguards are not present.
 
 **Conclusion:** the Phase 1 CI baseline is green. The project should not be described as clinically validated or production-ready on the basis of these software tests.
+
+## Render deployment verification — 2026-10-14
+
+- Frontend static site: https://vitalguard-ai-frontend.onrender.com
+- FastAPI backend: https://vitalguard-risk-api-9vie.onrender.com
+- API docs: https://vitalguard-risk-api-9vie.onrender.com/docs
+- Live smoke workflow: https://github.com/git-Abhihub/vitalpro/actions/runs/38540292214
+
+The Render smoke workflow passed from GitHub Actions. It verified that the frontend returned the application HTML and JavaScript bundle, the backend health endpoint and model metadata endpoint responded, the backend CORS preflight authorized the deployed frontend, a synthetic risk prediction returned the expected metadata, and the created observation was available through the observation-history endpoint.
+
+The services deploy from `main` with automatic deploys enabled. This deployment check verifies software availability and selected API behavior only; it does not demonstrate clinical reliability or a fully integrated clinical monitoring workflow.
+
+### Persistence status
+
+A Render PostgreSQL 16 free database was provisioned in the workspace, but it has not yet been linked to the backend's `DATABASE_URL`. The backend therefore still defaults to SQLite on the hosted filesystem. Demo history may not survive a restart or redeploy; connecting and verifying PostgreSQL remains follow-up work.
+
+### Security warning from deployment build
+
+Render's frontend build emitted an npm audit summary of **15 dependency vulnerabilities: 7 moderate, 6 high, and 2 critical**. The affected packages and available patched versions have not yet been triaged in this phase. Do not use `npm audit fix --force` blindly; review the advisory details and apply compatible dependency updates in a separate, tested change before treating the deployment as production-grade.
+
