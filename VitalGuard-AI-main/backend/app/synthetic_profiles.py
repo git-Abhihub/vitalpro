@@ -138,6 +138,10 @@ def build_synthetic_profile(
             "result": result,
             "unit": unit,
             "illustrative_band": f"{demo_low:g}–{demo_high:g} {unit}",
+            "illustrative_low": demo_low,
+            "illustrative_high": demo_high,
+            "display_min": generation_low,
+            "display_max": generation_high,
             "collected_at": last.isoformat(),
             "source": "Generated synthetic lab result",
         })
