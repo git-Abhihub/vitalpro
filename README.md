@@ -14,10 +14,10 @@ VitalGuard AI is a prototype for exploring patient-observation monitoring, synth
 
 ## Verification status
 
-The repository now includes per-patient vital progress and persisted-data analytics in addition to Phases 2–4 integration work. The patient directory exposes each patient's latest synthetic vitals, recent risk-score sparkline, sample count, and change from the previous score. The Analytics route uses backend API data in API mode: score distribution/direction, observation volume, alert lifecycle, feed freshness, latest cohort vital averages, and per-patient progress comparison.
+The repository now includes per-patient vital progress, backend-backed cohort analytics, and a full patient-detail explorer. Selecting a patient opens a fictional profile and history (conditions, mock medications/allergies, procedural/family/social history, illustrative test results), followed by latest vitals, saved observation history, and visual trend charts with latest/min/mean/max/change summaries. Both persisted API patients and local simulator patients have detailed views.
 
-- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991730) — frontend type-check, tests, build, and backend tests passed.
-- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991384) — deployed frontend/API regression passed; smoke coverage now includes two synthetic readings and verifies per-patient progress series and persisted history.
+- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38587858799) — frontend type-check, tests, production build, and backend tests passed.
+- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38587858853) — passed after the backend profile-only endpoint deployed; checks profile/test-result structure, per-patient progress, and persisted history.
 - [Phase 2 API integration pull request](https://github.com/git-Abhihub/vitalpro/pull/2)
 - [Phase 3 live dashboard updates pull request](https://github.com/git-Abhihub/vitalpro/pull/3)
 - [Phase 4 synthetic monitor stream pull request](https://github.com/git-Abhihub/vitalpro/pull/4)
@@ -25,6 +25,7 @@ The repository now includes per-patient vital progress and persisted-data analyt
 - [Phase 2 integration report](VitalGuard-AI-main/PHASE2_INTEGRATION_REPORT.md)
 - [Phase 4 synthetic monitor stream report](VitalGuard-AI-main/PHASE4_SYNTHETIC_STREAM_REPORT.md)
 - [Patient progress and analytics report](VitalGuard-AI-main/PHASE5_PATIENT_PROGRESS_ANALYTICS.md)
+- [Full synthetic patient history and detail explorer](VitalGuard-AI-main/PHASE6_PATIENT_HISTORY_EXPLORER.md)
 
 ## Persistence
 
