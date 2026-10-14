@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Activity, Clock3, RefreshCw, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api, type BackendPatientList } from '../../services/api.ts';
+import { VitalSpark } from '../charts/Vitals.tsx';
 import { useBackendLiveEvents } from '../../hooks/useBackendLiveEvents.ts';
 import type { LiveEvent } from '../../services/liveEvents.ts';
 
@@ -60,8 +61,8 @@ export function BackendPatientDirectory() {
           <Link to="/settings" className="btn-primary inline-flex mt-3">Open Risk Engine</Link>
         </div> :
         data && <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead><tr className="table-head"><th>Demo patient</th><th>Age</th><th>Latest synthetic score</th><th>Observations</th><th>Last observed</th><th><span className="sr-only">Open</span></th></tr></thead>
+          <table className="w-full min-w-[1320px] text-sm">
+            <thead><tr className="table-head"><th>Demo patient</th><th>Age</th><th>Latest demo score</th><th>Latest vitals</th><th>Signal progress</th><th>Observations</th><th>Last observed</th><th><span className="sr-only">Open</span></th></tr></thead>
             <tbody>{data.items.map((patient) => {
               const prediction = patient.latest_prediction;
               const levelClass = prediction.risk_level === 'critical' || prediction.risk_level === 'high'
@@ -73,6 +74,30 @@ export function BackendPatientDirectory() {
                 <td className="px-3 py-3">
                   <span className="font-bold tabular-nums">{prediction.risk_score}/100</span>
                   <span className={`ml-2 rounded-md px-2 py-1 text-[10px] uppercase font-bold ${levelClass}`}>{prediction.risk_level}</span>
+                </td>
+                <td className="px-3 py-3 min-w-[220px]">
+                  <p className="text-xs font-semibold tabular-nums">HR {patient.latest_inputs.heart_rate} bpm · SpO₂ {patient.latest_inputs.spo2}%</p>
+                  <p className="text-[11px] text-slate-500 mt-1 tabular-nums">BP {patient.latest_inputs.systolic_bp}/{patient.latest_inputs.diastolic_bp} · {patient.latest_inputs.temperature}°C · RR {patient.latest_inputs.respiratory_rate}</p>
+                </td>
+                <td className="px-3 py-3 min-w-[200px]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 shrink-0">
+                      <VitalSpark
+                        data={patient.progress?.risk_scores?.length ? patient.progress.risk_scores : [prediction.risk_score]}
+                        color={prediction.risk_level === 'critical' || prediction.risk_level === 'high' ? '#e11d48' : prediction.risk_level === 'moderate' ? '#d97706' : '#0d9488'}
+                        height={34}
+                      />
+                    </div>
+                    <span className="text-[10px] text-slate-500 whitespace-nowrap">
+                      {patient.progress?.risk_direction === 'increasing' ? 'Rising' : patient.progress?.risk_direction === 'decreasing' ? 'Falling' : patient.progress?.risk_direction === 'stable' ? 'Stable' : 'Collecting history'}
+                    </span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 mt-1.5 overflow-hidden" aria-label={`Latest synthetic score ${prediction.risk_score} out of 100`}>
+                    <div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, prediction.risk_score))}%`, background: prediction.risk_level === 'critical' || prediction.risk_level === 'high' ? '#e11d48' : prediction.risk_level === 'moderate' ? '#d97706' : '#0d9488' }} />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 tabular-nums">
+                    {patient.progress?.risk_delta == null ? 'Need 2+ samples for change' : `${patient.progress.previous_risk_score} → ${prediction.risk_score} · ${patient.progress.risk_delta > 0 ? '+' : ''}${patient.progress.risk_delta}`}
+                  </p>
                 </td>
                 <td className="px-3 py-3 tabular-nums">{patient.observation_count}</td>
                 <td className="px-3 py-3 text-xs text-slate-500 whitespace-nowrap"><Clock3 size={12} className="inline mr-1" />{fmtTimestamp(patient.last_observed_at)}</td>
