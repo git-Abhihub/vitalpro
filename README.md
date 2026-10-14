@@ -16,11 +16,13 @@ VitalGuard AI is a prototype for exploring patient-observation monitoring, synth
 
 Deployment smoke tests last passed on 2026-10-14 against the public Render URLs below; the links are stable unless the Render services are recreated.
 
-The current main-branch CI run passed frontend type-check/lint, **28 frontend tests**, the production build, and **17 backend tests**. The deployed frontend and backend also passed the live Render smoke workflow, including health, model metadata, CORS, synthetic prediction, and persisted observation-history checks.
+The current `main` deployment's Phase 1 checks passed **28 frontend tests** and **17 backend tests**. The Phase 2 integration branch has since passed **32 frontend tests**, **25 backend tests**, type-checking, and production build. Phase 2 changes are not live until they are merged and Render redeploys.
 
 - [Successful Phase 1 CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954917)
-- [Successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954959)
+- [Successful Phase 1 Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954959)
+- [Phase 2 integration CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38550837702)
 - [Phase 1 stabilisation report](VitalGuard-AI-main/PHASE1_AUDIT.md)
+- [Phase 2 integration report](VitalGuard-AI-main/PHASE2_INTEGRATION_REPORT.md)
 
 ## Current deployment limitation
 
