@@ -4,8 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/live-api-smoke.yml'
-      - 'scripts/smoke-test.mjs'
+      - 'VitalGuard-AI-main/.github/workflows/live-api-smoke.yml'
+      - 'VitalGuard-AI-main/scripts/smoke-test.mjs'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'VitalGuard-AI-main/.github/workflows/live-api-smoke.yml'
+      - 'VitalGuard-AI-main/scripts/smoke-test.mjs'
   workflow_dispatch:
     inputs:
       api_base_url:
@@ -21,6 +26,9 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: VitalGuard-AI-main
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
