@@ -127,11 +127,32 @@ jobs:
           if (prediction.patient_id !== patientId || !(prediction.observation_id > 0) || prediction.demo_only !== true) {
             throw new Error('prediction response missing expected demo/persistence metadata');
           }
-          const { data: history } = await request(`/api/v1/observations?patient_id=${encodeURIComponent(patientId)}&limit=10`);
-          if (!history.items?.some(item => item.id === prediction.observation_id)) {
-            throw new Error('prediction was not found in persisted observation history');
+          const { data: secondPrediction } = await request('/api/v1/risk/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Origin: frontend },
+            body: JSON.stringify({
+              patient_id: patientId, age: 58, heart_rate: 90, spo2: 96,
+              systolic_bp: 124, diastolic_bp: 80, temperature: 37.1, respiratory_rate: 18
+            })
+          });
+          if (!(secondPrediction.observation_id > prediction.observation_id)) {
+            throw new Error('second synthetic observation was not saved after the first observation');
           }
-          console.log('Backend smoke passed: health, model metadata, CORS, prediction, and persisted history.');
+
+          const { data: patient } = await request(`/api/v1/patients/${encodeURIComponent(patientId)}`);
+          const progress = patient.progress;
+          if (patient.patient_id !== patientId || progress?.sample_count !== 2 ||
+              progress?.risk_scores?.length !== 2 || progress?.heart_rates?.join(',') !== '82,90' ||
+              progress?.spo2_values?.join(',') !== '98,96' || typeof progress?.risk_delta !== 'number') {
+            throw new Error(`patient progress response missing expected two-sample vital/risk series: ${JSON.stringify(progress)}`);
+          }
+
+          const { data: history } = await request(`/api/v1/observations?patient_id=${encodeURIComponent(patientId)}&limit=10`);
+          const historyIds = history.items?.map(item => item.id) ?? [];
+          if (!historyIds.includes(prediction.observation_id) || !historyIds.includes(secondPrediction.observation_id)) {
+            throw new Error('one or more predictions were not found in persisted observation history');
+          }
+          console.log('Backend smoke passed: health, model metadata, CORS, prediction, two-sample patient progress, vital trends, and persisted history.');
           console.log(`API base: ${base}`);
           NODE
 
