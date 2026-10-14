@@ -61,7 +61,7 @@ export function BackendAnalyticsPage() {
   }, []);
 
   const handleLiveEvent = useCallback((event: LiveEvent) => {
-    if (event.type === 'observation.created' || event.type === 'alert.created' || event.type === 'alert.updated') {
+    if (event.type === 'observation.created' || event.type === 'alert.created') {
       void load();
     }
   }, [load]);
