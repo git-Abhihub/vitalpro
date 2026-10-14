@@ -6,8 +6,9 @@ import { MiniBars } from '../components/charts/Vitals.tsx';
 import { RiskTrajectoryChart } from '../components/charts/Trajectory.tsx';
 import { Sparkline } from '../components/ui/premium.tsx';
 import { useSimulation } from '../store/useSimulation.ts';
+import { BackendAnalyticsPage } from './BackendAnalyticsPage.tsx';
 export function AnalyticsPage() {
-  const { patients, risks, alerts } = useSimulation();
+  const { patients, risks, alerts, dataSource } = useSimulation();
   const vals = Object.values(risks);
   const dist = [
     { name: 'Critical', value: vals.filter((r) => r.level === 'critical').length },
@@ -34,6 +35,7 @@ export function AnalyticsPage() {
   const rec1 = risks['P-SIM-004'];
   const open = alerts.filter((a) => a.status === 'open').length;
   const trendRows = Object.values(risks).slice(0, 8).flatMap((r) => r.trajectory).slice(-18);
+  if (dataSource === 'api') return <BackendAnalyticsPage />;
   return (
     <Shell title="Analytics" subtitle="Cohort intelligence workspace">
       <PageHeader eyebrow="Cohort intelligence" title="Analytics"
