@@ -109,7 +109,7 @@ async function main() {
   assert.ok(preflight.ok, `CORS preflight returned ${preflight.status}`);
   assert.equal(
     preflight.headers.get('access-control-allow-origin'),
-    'https://vitalguard-ai-g215.onrender.com',
+    'https://vitalguard-ai-frontend.onrender.com',
     'CORS must allow the deployed frontend origin',
   );
   console.log('✓ Frontend CORS preflight');
