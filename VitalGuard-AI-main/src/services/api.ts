@@ -66,7 +66,7 @@ export interface BackendPatientSummary {
   latest_inputs: Omit<RiskPredictionInput, 'patient_id'>;
   latest_prediction: RiskPredictionResult;
   model_version: string;
-  progress: PatientProgress;
+  progress?: PatientProgress;
   demo_only: true;
 }
 export interface BackendAlert {
