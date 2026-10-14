@@ -14,11 +14,15 @@ The demo frontend and synthetic risk API are deployed on Render:
 - **Model metadata:** https://vitalguard-risk-api-9vie.onrender.com/api/v1/model/info
 - **Render deployment smoke workflow:** https://github.com/git-Abhihub/vitalpro/actions/workflows/render-smoke.yml
 
-The frontend and API deploy automatically from the `main` branch. The root-level Render smoke workflow checks that the frontend serves its application bundle, the backend health and model metadata endpoints respond, CORS permits the deployed frontend, and a synthetic prediction is persisted and returned in observation history.
+Phase 2 has been merged into `main` and the frontend and backend have been redeployed. The latest Render smoke test passed checks covering frontend assets, API health/model metadata, CORS, synthetic prediction persistence, model evaluation/contributions, NEWS2 demo scoring, trend/data-quality endpoints, and persistent alert/timeline APIs.
 
-**Persistence limitation:** the backend has not yet been connected to the newly created Render PostgreSQL database. It currently falls back to SQLite on the hosted service's local filesystem; this storage can be ephemeral and demo history may be lost on redeploy or restart. Do not store real patient data.
+- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217294)
+- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217384)
+- [Phase 2 integration report](PHASE2_INTEGRATION_REPORT.md)
 
-The frontend is intentionally configured for synthetic demo mode. The model is not clinically validated and must not be used for diagnosis, triage, or treatment decisions.
+**Persistence limitation:** the backend is still using SQLite on the hosted service filesystem. A Render PostgreSQL database is provisioned but has not been linked to the backend's `DATABASE_URL` yet; hosted demo history may be lost across restarts or redeploys. Link it in the backend service's private Render environment settings and rerun the smoke test before calling hosted persistence durable.
+
+The frontend starts in backend API mode, with local synthetic demo mode still selectable in Settings. The model and NEWS2 demonstration are not clinically validated and must not be used for diagnosis, triage, or treatment decisions.
 
 ## Requirements
 
