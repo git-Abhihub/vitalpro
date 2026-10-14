@@ -71,6 +71,10 @@ export interface SyntheticLabResult {
   result: number;
   unit: string;
   illustrative_band: string;
+  illustrative_low: number;
+  illustrative_high: number;
+  display_min: number;
+  display_max: number;
   collected_at: string;
   source: string;
 }
