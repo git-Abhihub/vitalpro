@@ -87,7 +87,9 @@ def test_trends_quality_and_timeline_endpoints(client):
     timeline = client.get(f"/api/v1/patients/{patient_id}/timeline?limit=30")
     assert timeline.status_code == 200
     assert timeline.json()["count"] >= 2
-    assert all(item["type"] == "observation" for item in timeline.json()["items"])
+    assert any(item["type"] == "observation" for item in timeline.json()["items"])
+    # A synthetic score can cross the demo alert threshold, so the timeline may
+    # also include alert/audit events for the same patient ID.
 
 
 def test_model_evaluation_and_coefficients_are_explicitly_synthetic(client):
