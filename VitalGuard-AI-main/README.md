@@ -14,11 +14,12 @@ The demo frontend and synthetic risk API are deployed on Render:
 - **Model metadata:** https://vitalguard-risk-api-9vie.onrender.com/api/v1/model/info
 - **Render deployment smoke workflow:** https://github.com/git-Abhihub/vitalpro/actions/workflows/render-smoke.yml
 
-Phase 2 has been merged into `main` and the frontend and backend have been redeployed. The latest Render smoke test passed checks covering frontend assets, API health/model metadata, CORS, synthetic prediction persistence, model evaluation/contributions, NEWS2 demo scoring, trend/data-quality endpoints, and persistent alert/timeline APIs.
+Phases 2–4 are merged into `main`. Phase 4 adds a synthetic monitor stream panel to backend API mode; the frontend was successfully redeployed at commit `5db4023beab4e03f827a3d6767fc39882bb9b053`. The latest main CI and Render smoke test passed. Smoke coverage includes frontend assets, API health/model metadata, CORS, synthetic prediction/history, model evaluation/contributions, NEWS2 demo scoring, trend/data-quality endpoints, and alert/timeline APIs.
 
-- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217294)
-- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38552217384)
+- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38558871128)
+- [Latest successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38558871163)
 - [Phase 2 integration report](PHASE2_INTEGRATION_REPORT.md)
+- [Phase 4 synthetic monitor stream report](PHASE4_SYNTHETIC_STREAM_REPORT.md)
 
 **Persistence limitation:** the backend is still using SQLite on the hosted service filesystem. A Render PostgreSQL database is provisioned but has not been linked to the backend's `DATABASE_URL` yet; hosted demo history may be lost across restarts or redeploys. Link it in the backend service's private Render environment settings and rerun the smoke test before calling hosted persistence durable.
 
@@ -92,6 +93,7 @@ Copy `.env.example` to `.env` for local development. Vite variables prefixed wit
 - Source-documented NEWS2 parameter scoring demo endpoint (`POST /api/v1/scores/news2`) and Settings calculator; this is not a clinically validated or approved implementation.
 - Unified persisted patient timeline (`GET /api/v1/patients/{patient_id}/timeline`) and descriptive trend endpoint (`GET /api/v1/observations/trends?patient_id=...`).
 - Deterministic simulator endpoint for stable, worsening, and recovering fictional observation scenarios.
+- API dashboard includes a start/pause synthetic monitor stream that submits fictional readings through the backend every five seconds and refreshes subscribed views over the WebSocket. It does not connect to physical bedside equipment.
 
 ### Phase 1 API: synthetic observation ingestion
 
