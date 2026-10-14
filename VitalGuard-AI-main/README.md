@@ -16,8 +16,8 @@ The demo frontend and synthetic risk API are deployed on Render:
 
 Phases 2–4 are merged into `main`. Phase 5 adds persisted per-patient vital progress and a backend-backed Analytics view. The directory now shows each patient's latest vital readings, a recent synthetic-score sparkline/progress bar, sample count, last-observed time, and change from the previous score when history is available. In backend API mode, Analytics reads saved patient summaries, alert lifecycle, and data freshness from the backend instead of mixing in the local simulator cohort.
 
-- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38579449086) — frontend type-check, tests, production build and backend tests passed.
-- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38579449227) — live API progress-series and persisted-history checks passed.
+- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991730) — frontend type-check, tests, production build and backend tests passed.
+- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991384) — live API progress-series and persisted-history checks passed.
 - [Phase 2 integration report](PHASE2_INTEGRATION_REPORT.md)
 - [Phase 4 synthetic monitor stream report](PHASE4_SYNTHETIC_STREAM_REPORT.md)
 - [Phase 5 patient progress and analytics report](PHASE5_PATIENT_PROGRESS_ANALYTICS.md)
