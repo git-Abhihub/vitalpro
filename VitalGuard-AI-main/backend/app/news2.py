@@ -40,16 +40,14 @@ def _spo2_scale1(value: float) -> int:
     return 0
 
 
-def _spo2_scale2(value: float, supplemental_oxygen: bool) -> int:
-    if supplemental_oxygen:
-        if value >= 97: return 3
-        if value >= 95: return 2
-        if value >= 93: return 1
-    elif value >= 93:
-        return 0
-    if value >= 88: return 0
-    if value >= 86: return 1
-    if value >= 84: return 2
+def _spo2_scale2(value: float) -> int:
+    # NEWS2 Scale 2 target band is 88–92%; oxygen use is scored separately.
+    if value <= 83: return 3
+    if value <= 85: return 2
+    if value <= 87: return 1
+    if value <= 92: return 0
+    if value <= 94: return 1
+    if value <= 96: return 2
     return 3
 
 
@@ -87,7 +85,7 @@ def news2_score(payload: News2Input):
         )
     parameter_scores = {
         "respiratory_rate": _respiratory_rate(payload.respiratory_rate),
-        "spo2": _spo2_scale1(payload.spo2) if payload.spo2_scale == 1 else _spo2_scale2(payload.spo2, payload.supplemental_oxygen),
+        "spo2": _spo2_scale1(payload.spo2) if payload.spo2_scale == 1 else _spo2_scale2(payload.spo2),
         "supplemental_oxygen": 2 if payload.supplemental_oxygen else 0,
         "systolic_bp": _systolic_bp(payload.systolic_bp),
         "heart_rate": _heart_rate(payload.heart_rate),
