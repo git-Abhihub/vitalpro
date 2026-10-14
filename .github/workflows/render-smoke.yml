@@ -1,0 +1,128 @@
+name: Render deployment smoke test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/render-smoke.yml"
+  workflow_dispatch:
+    inputs:
+      frontend_url:
+        description: "Deployed frontend URL"
+        required: false
+        default: "https://vitalguard-ai-frontend.onrender.com"
+        type: string
+      api_base_url:
+        description: "Deployed API base URL"
+        required: false
+        default: "https://vitalguard-risk-api-9vie.onrender.com"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify deployed frontend
+        env:
+          FRONTEND_URL: ${{ inputs.frontend_url || 'https://vitalguard-ai-frontend.onrender.com' }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.FRONTEND_URL.replace(/\/$/, '');
+          let lastError;
+          for (let attempt = 1; attempt <= 12; attempt++) {
+            try {
+              const response = await fetch(base, { signal: AbortSignal.timeout(15000) });
+              if (!response.ok) throw new Error(`frontend returned HTTP ${response.status}`);
+              const html = await response.text();
+              if (!html.includes('<div id="root">') && !html.includes('id="root"')) {
+                throw new Error('frontend HTML did not include the app root element');
+              }
+              const asset = html.match(/src="([^"]+\.js)"/);
+              if (asset) {
+                const assetResponse = await fetch(new URL(asset[1], base));
+                if (!assetResponse.ok) throw new Error(`frontend JavaScript returned HTTP ${assetResponse.status}`);
+              }
+              console.log(`Frontend smoke test passed: ${base}`);
+              process.exit(0);
+            } catch (error) {
+              lastError = error;
+              console.log(`Frontend attempt ${attempt}/12 failed: ${error.message}`);
+              await new Promise(resolve => setTimeout(resolve, 10000));
+            }
+          }
+          throw lastError;
+          NODE
+
+      - name: Verify backend health, metadata, prediction, and persistence
+        env:
+          VITALGUARD_API_URL: ${{ inputs.api_base_url || 'https://vitalguard-risk-api-9vie.onrender.com' }}
+          FRONTEND_URL: ${{ inputs.frontend_url || 'https://vitalguard-ai-frontend.onrender.com' }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.VITALGUARD_API_URL.replace(/\/$/, '');
+          const frontend = process.env.FRONTEND_URL.replace(/\/$/, '');
+          const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+          async function request(path, init = {}) {
+            const response = await fetch(base + path, { ...init, signal: AbortSignal.timeout(15000) });
+            const text = await response.text();
+            let data;
+            try { data = JSON.parse(text); } catch { data = text; }
+            if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}: ${text.slice(0, 300)}`);
+            return { response, data };
+          }
+
+          let ready = false;
+          let lastError;
+          for (let attempt = 1; attempt <= 12; attempt++) {
+            try {
+              const { data } = await request('/health');
+              if (data.status !== 'ok') throw new Error('health status is not ok');
+              ready = true;
+              break;
+            } catch (error) {
+              lastError = error;
+              console.log(`Backend health attempt ${attempt}/12 failed: ${error.message}`);
+              await pause(10000);
+            }
+          }
+          if (!ready) throw lastError;
+
+          const { data: model } = await request('/api/v1/model/info');
+          if (model.clinically_validated !== false || model.demo_only !== true) {
+            throw new Error('model endpoint did not clearly identify the synthetic demo model');
+          }
+
+          const preflight = await fetch(base + '/api/v1/risk/predict', {
+            method: 'OPTIONS',
+            headers: { Origin: frontend, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type' },
+            signal: AbortSignal.timeout(15000)
+          });
+          if (!preflight.ok || preflight.headers.get('access-control-allow-origin') !== frontend) {
+            throw new Error('CORS preflight did not authorize the deployed frontend origin');
+          }
+
+          const patientId = `DEMO-SMOKE-${Date.now()}`;
+          const { data: prediction } = await request('/api/v1/risk/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Origin: frontend },
+            body: JSON.stringify({
+              patient_id: patientId, age: 58, heart_rate: 82, spo2: 98,
+              systolic_bp: 122, diastolic_bp: 78, temperature: 37.0, respiratory_rate: 16
+            })
+          });
+          if (prediction.patient_id !== patientId || !(prediction.observation_id > 0) || prediction.demo_only !== true) {
+            throw new Error('prediction response missing expected demo/persistence metadata');
+          }
+          const { data: history } = await request(`/api/v1/observations?patient_id=${encodeURIComponent(patientId)}&limit=10`);
+          if (!history.items?.some(item => item.id === prediction.observation_id)) {
+            throw new Error('prediction was not found in persisted observation history');
+          }
+          console.log('Backend smoke passed: health, model metadata, CORS, prediction, and persisted history.');
+          console.log(`API base: ${base}`);
+          NODE
