@@ -18,8 +18,8 @@ Deployment smoke tests last passed on 2026-10-14 against the public Render URLs 
 
 The current main-branch CI run passed frontend type-check/lint, **28 frontend tests**, the production build, and **17 backend tests**. The deployed frontend and backend also passed the live Render smoke workflow, including health, model metadata, CORS, synthetic prediction, and persisted observation-history checks.
 
-- [Latest Phase 1 CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954917)
-- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954959)
+- [Successful Phase 1 CI run](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954917)
+- [Successful Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38540954959)
 - [Phase 1 stabilisation report](VitalGuard-AI-main/PHASE1_AUDIT.md)
 
 ## Current deployment limitation
