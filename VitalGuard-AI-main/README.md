@@ -4,6 +4,22 @@
 >
 > VitalGuard AI is a software prototype for exploring patient-observation monitoring, risk-signal visualisation and alert workflows. The included patients and observations are synthetic. The current risk model is trained on generated data and is not clinically validated.
 
+## Live deployment
+
+The demo frontend and synthetic risk API are deployed on Render:
+
+- **Frontend:** https://vitalguard-ai-frontend.onrender.com
+- **API health:** https://vitalguard-risk-api-9vie.onrender.com/health
+- **API documentation:** https://vitalguard-risk-api-9vie.onrender.com/docs
+- **Model metadata:** https://vitalguard-risk-api-9vie.onrender.com/api/v1/model/info
+- **Render deployment smoke workflow:** https://github.com/git-Abhihub/vitalpro/actions/workflows/render-smoke.yml
+
+The frontend and API deploy automatically from the `main` branch. The root-level Render smoke workflow checks that the frontend serves its application bundle, the backend health and model metadata endpoints respond, CORS permits the deployed frontend, and a synthetic prediction is persisted and returned in observation history.
+
+**Persistence limitation:** the backend has not yet been connected to the newly created Render PostgreSQL database. It currently falls back to SQLite on the hosted service's local filesystem; this storage can be ephemeral and demo history may be lost on redeploy or restart. Do not store real patient data.
+
+The frontend is intentionally configured for synthetic demo mode. The model is not clinically validated and must not be used for diagnosis, triage, or treatment decisions.
+
 ## Requirements
 
 - Node.js 20 or newer (Node.js 22 LTS recommended)
