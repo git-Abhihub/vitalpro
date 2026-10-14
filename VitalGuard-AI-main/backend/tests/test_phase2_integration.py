@@ -41,9 +41,19 @@ def test_patient_directory_and_vitals_are_derived_from_saved_records(client):
     assert match["latest_inputs"]["heart_rate"] == 95
     assert match["latest_observation_id"] == second.json()["observation_id"]
 
+    progress = match["progress"]
+    assert progress["sample_count"] == 2
+    assert progress["risk_scores"] == [first.json()["risk_score"], second.json()["risk_score"]]
+    assert progress["heart_rates"] == [82, 95]
+    assert progress["spo2_values"] == [98, 95]
+    assert progress["risk_delta"] == second.json()["risk_score"] - first.json()["risk_score"]
+    assert progress["risk_direction"] in {"increasing", "decreasing", "stable"}
+    assert len(progress["timestamps"]) == 2
+
     detail = client.get("/api/v1/patients/DEMO-PHASE2-001")
     assert detail.status_code == 200
     assert detail.json()["age"] == 58
+    assert detail.json()["progress"]["sample_count"] == 2
 
     history = client.get("/api/v1/patients/DEMO-PHASE2-001/vitals?limit=100")
     assert history.status_code == 200
