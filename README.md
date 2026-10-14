@@ -16,8 +16,8 @@ VitalGuard AI is a prototype for exploring patient-observation monitoring, synth
 
 The repository now includes per-patient vital progress and persisted-data analytics in addition to Phases 2–4 integration work. The patient directory exposes each patient's latest synthetic vitals, recent risk-score sparkline, sample count, and change from the previous score. The Analytics route uses backend API data in API mode: score distribution/direction, observation volume, alert lifecycle, feed freshness, latest cohort vital averages, and per-patient progress comparison.
 
-- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38579449086) — frontend type-check, tests, build, and backend tests passed.
-- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38579449227) — deployed frontend/API regression passed; smoke coverage now includes two synthetic readings and verifies per-patient progress series and persisted history.
+- [Latest main CI](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991730) — frontend type-check, tests, build, and backend tests passed.
+- [Latest Render smoke test](https://github.com/git-Abhihub/vitalpro/actions/runs/38579991384) — deployed frontend/API regression passed; smoke coverage now includes two synthetic readings and verifies per-patient progress series and persisted history.
 - [Phase 2 API integration pull request](https://github.com/git-Abhihub/vitalpro/pull/2)
 - [Phase 3 live dashboard updates pull request](https://github.com/git-Abhihub/vitalpro/pull/3)
 - [Phase 4 synthetic monitor stream pull request](https://github.com/git-Abhihub/vitalpro/pull/4)
