@@ -146,13 +146,28 @@ jobs:
               progress?.spo2_values?.join(',') !== '98,96' || typeof progress?.risk_delta !== 'number') {
             throw new Error(`patient progress response missing expected two-sample vital/risk series: ${JSON.stringify(progress)}`);
           }
+          const profile = patient.profile;
+          if (!profile || profile.patient_id !== patientId || !profile.full_name ||
+              profile.demo_only !== true || profile.clinically_validated !== false ||
+              !Array.isArray(profile.conditions) || !Array.isArray(profile.medications) ||
+              !Array.isArray(profile.allergies) || !Array.isArray(profile.test_results) ||
+              profile.test_results.length < 6 || !profile.profile_notice.toLowerCase().includes('fictional')) {
+            throw new Error(`saved patient response missing full fictional profile and test results: ${JSON.stringify(profile)}`);
+          }
+
+          const { data: profileOnly } = await request('/api/v1/patient-profiles/DEMO-SMOKE-PROFILE?age=67');
+          if (profileOnly.patient_id !== 'DEMO-SMOKE-PROFILE' || profileOnly.age !== 67 ||
+              profileOnly.demo_only !== true || profileOnly.clinically_validated !== false ||
+              !Array.isArray(profileOnly.test_results) || profileOnly.test_results.length < 6) {
+            throw new Error('synthetic profile endpoint failed for a patient with no saved observations');
+          }
 
           const { data: history } = await request(`/api/v1/observations?patient_id=${encodeURIComponent(patientId)}&limit=10`);
           const historyIds = history.items?.map(item => item.id) ?? [];
           if (!historyIds.includes(prediction.observation_id) || !historyIds.includes(secondPrediction.observation_id)) {
             throw new Error('one or more predictions were not found in persisted observation history');
           }
-          console.log('Backend smoke passed: health, model metadata, CORS, prediction, two-sample patient progress, vital trends, and persisted history.');
+          console.log('Backend smoke passed: health, model metadata, CORS, prediction, two-sample patient progress, fictional patient history and test results, profile without saved observations, vital trends, and persisted history.');
           console.log(`API base: ${base}`);
           NODE
 
