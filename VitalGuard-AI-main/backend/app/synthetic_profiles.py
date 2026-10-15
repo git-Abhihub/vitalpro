@@ -10,12 +10,18 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 FIRST_NAMES = (
-    "Aarav", "Anaya", "Arjun", "Diya", "Ishaan", "Kavya", "Meera", "Neel",
-    "Riya", "Vihaan", "Aditi", "Kabir", "Mira", "Reyansh", "Sana", "Vivaan",
+    "Aarav", "Aadhya", "Abhinav", "Aditya", "Akshara", "Ananya", "Anirudh",
+    "Arjun", "Bhavana", "Charan", "Deepika", "Harini", "Harsha", "Ishita",
+    "Karthik", "Keerthana", "Lakshmi", "Madhav", "Manasa", "Naveen", "Nikhil",
+    "Pallavi", "Pranav", "Priya", "Rahul", "Sai", "Saanvi", "Sravya", "Tejas",
+    "Venkatesh", "Yash", "Aishwarya", "Divya", "Gowtham", "Meghana", "Rohit",
 )
 LAST_NAMES = (
-    "Rao", "Mehta", "Iyer", "Shah", "Reddy", "Kapoor", "Nair", "Patel",
-    "Menon", "Verma", "Das", "Kulkarni", "Bose", "Malhotra", "Joshi", "Gupta",
+    "Reddy", "Rao", "Naidu", "Chowdary", "Goud", "Varma", "Sharma", "Gupta",
+    "Patel", "Iyer", "Nair", "Menon", "Kulkarni", "Deshmukh", "Joshi", "Jadhav",
+    "Kumar", "Mishra", "Singh", "Yadav", "Das", "Bose", "Mukherjee", "Banerjee",
+    "Chatterjee", "Kapoor", "Malhotra", "Mehta", "Shah", "Pillai", "Shetty",
+    "Hegde", "Krishnan", "Subramanian", "Bhat", "Khan",
 )
 SEXES = ("Female", "Male", "Female", "Male", "Non-binary")
 BLOOD_GROUPS = ("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")
