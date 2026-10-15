@@ -56,8 +56,15 @@ def _summary(
     record = item["record"]
     inputs = record["inputs"]
     records = progress_records if progress_records is not None else [record]
+    profile = build_synthetic_profile(
+        patient_id=record["patient_id"],
+        age=inputs.get("age"),
+        first_observed_at=records[0]["created_at"] if records else record["created_at"],
+        last_observed_at=record["created_at"],
+    )
     summary = {
         "patient_id": record["patient_id"],
+        "full_name": profile["full_name"],
         "age": inputs.get("age"),
         "latest_observation_id": record["id"],
         "last_observed_at": record["created_at"],
@@ -69,13 +76,7 @@ def _summary(
         "demo_only": True,
     }
     if include_profile:
-        first_observed_at = records[0]["created_at"] if records else record["created_at"]
-        summary["profile"] = build_synthetic_profile(
-            patient_id=record["patient_id"],
-            age=inputs.get("age"),
-            first_observed_at=first_observed_at,
-            last_observed_at=record["created_at"],
-        )
+        summary["profile"] = profile
     return summary
 
 
